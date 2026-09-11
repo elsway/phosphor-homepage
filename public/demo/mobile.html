@@ -3,229 +3,395 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>Autonaut Icons — mobile demo</title>
+<title>Autonaut Icons — live demo</title>
 <style>
   :root {
-    --bg: #f3f1ec;
+    --bg: #ededed;
     --card: #ffffff;
-    --ink: #2b2e22;
-    --muted: #8a8c82;
-    --accent: #3c402b;
-    --line: #e6e2d8;
+    --ink: #1a1a1a;
+    --ink-mid: #6a6a6a;
+    --ink-soft: #9a9a9a;
+    --line: rgb(0 0 0 / 8%);
+    --fill: rgb(0 0 0 / 5%);
+    --fill-hover: rgb(0 0 0 / 8%);
+    --radius: 12px;
+    --mono: "Departure Mono", ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  }
+  @font-face {
+    font-family: "Departure Mono";
+    src: url("../fonts/DepartureMono-Regular.woff2") format("woff2");
+    font-display: swap;
   }
   * { box-sizing: border-box; }
-  html, body {
-    margin: 0; padding: 0;
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-    background: #d8d4cb;
-    color: var(--ink);
+  body {
+    margin: 0;
     min-height: 100vh;
-    display: flex; justify-content: center; align-items: center;
-  }
-  .device {
-    width: 375px; height: 760px;
+    padding: 32px 20px 56px;
+    font-family: var(--mono);
     background: var(--bg);
-    border-radius: 36px;
-    box-shadow: 0 30px 80px rgba(0,0,0,.18);
-    overflow: hidden;
-    display: flex; flex-direction: column;
-    position: relative;
-    border: 10px solid #1a1a1a;
+    color: var(--ink);
+    -webkit-font-smoothing: antialiased;
+  }
+
+  .wrap {
+    max-width: 1040px;
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 360px;
+    gap: 40px;
+    align-items: start;
+  }
+
+  /* ---------- controls ---------- */
+  .panel > h1 {
+    font-size: 20px;
+    font-weight: 400;
+    margin: 0 0 6px;
+  }
+  .panel .lede {
+    margin: 0 0 28px;
+    font-size: 13px;
+    line-height: 1.6;
+    color: var(--ink-mid);
+  }
+  .field { margin-bottom: 22px; }
+  .field > span {
+    display: block;
+    font-size: 10px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--ink-soft);
+    margin-bottom: 8px;
+  }
+  .segments { display: flex; flex-wrap: wrap; gap: 6px; }
+  .seg {
+    min-height: 40px;
+    padding: 0 14px;
+    border: 1px solid transparent;
+    border-radius: 999px;
+    background: var(--fill);
+    color: var(--ink);
+    font-family: inherit;
+    font-size: 13px;
+    cursor: pointer;
+  }
+  .seg:hover { background: var(--fill-hover); }
+  .seg:focus-visible { outline: none; box-shadow: 0 0 0 1px rgb(0 0 0 / 40%); }
+  .seg[aria-pressed="true"] { background: var(--ink); border-color: var(--ink); color: #fff; }
+
+  .source {
+    margin-top: 28px;
+    padding: 14px 16px;
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    background: var(--card);
+  }
+  .source b {
+    display: block;
+    font-size: 10px;
+    font-weight: 400;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--ink-soft);
+    margin-bottom: 8px;
+  }
+  .source code {
+    display: block;
+    font-family: inherit;
+    font-size: 11.5px;
+    line-height: 1.7;
+    word-break: break-all;
+    color: var(--ink-mid);
+  }
+  .source code em { font-style: normal; color: var(--ink); }
+  .status {
+    margin-top: 10px;
+    font-size: 11.5px;
+    color: var(--ink-mid);
+  }
+  .status[data-state="error"] { color: #b3261e; }
+
+  /* ---------- phone ---------- */
+  .stage { display: flex; justify-content: center; }
+  .device {
+    width: 320px;
+    background: var(--card);
+    border: 10px solid var(--ink);
+    border-radius: 40px;
+    padding: 10px 14px 14px;
+    box-shadow: 0 30px 70px rgb(0 0 0 / 14%);
   }
   .statusbar {
-    height: 40px;
     display: flex; justify-content: space-between; align-items: center;
-    padding: 0 24px;
-    font-size: 14px; font-weight: 600;
+    font-size: 12px; padding: 4px 6px 12px;
   }
-  .statusbar-icons { display: flex; gap: 6px; align-items: center; }
-  .statusbar-icons .icn { width: 16px; height: 16px; }
-  header {
-    padding: 8px 20px 16px;
+  .statusbar-icons { display: flex; gap: 6px; }
+  header.app {
     display: flex; justify-content: space-between; align-items: center;
+    padding: 0 4px 14px;
   }
-  header h1 { margin: 0; font-size: 26px; font-weight: 700; }
-  header .avatar {
+  header.app h2 { margin: 0; font-size: 22px; font-weight: 400; }
+  .avatar {
     width: 38px; height: 38px; border-radius: 50%;
-    background: var(--accent);
-    display: flex; align-items: center; justify-content: center;
-    color: white;
+    background: var(--ink); color: #fff;
+    display: grid; place-items: center;
   }
   .search {
-    margin: 0 20px;
-    background: var(--card);
-    border: 1px solid var(--line);
-    border-radius: 14px;
-    height: 44px;
-    display: flex; align-items: center; gap: 10px; padding: 0 14px;
-    color: var(--muted);
+    display: flex; align-items: center; gap: 10px;
+    height: 44px; padding: 0 14px; margin-bottom: 14px;
+    border-radius: 10px; background: var(--fill);
   }
-  .search input { border: none; outline: none; flex: 1; background: transparent; font-size: 15px; color: var(--ink); }
+  .search input {
+    flex: 1; min-width: 0; border: none; background: none;
+    font-family: inherit; font-size: 13px; color: var(--ink);
+  }
+  .search input:focus { outline: none; }
   .chips {
-    display: flex; gap: 8px; padding: 16px 20px; overflow-x: auto;
+    display: flex; gap: 8px; margin-bottom: 16px;
+    overflow-x: auto; scrollbar-width: none;
   }
+  .chips::-webkit-scrollbar { display: none; }
   .chip {
-    flex-shrink: 0;
-    background: var(--card);
-    border: 1px solid var(--line);
-    border-radius: 999px;
-    padding: 8px 14px;
-    font-size: 13px;
-    display: inline-flex; align-items: center; gap: 6px;
-    color: var(--ink);
+    flex: 0 0 auto; display: inline-flex; align-items: center; gap: 7px;
+    height: 36px; padding: 0 13px; border-radius: 999px;
+    background: var(--fill); font-size: 12.5px; white-space: nowrap;
   }
-  .chip.active { background: var(--accent); color: white; border-color: var(--accent); }
-  .list { flex: 1; overflow-y: auto; padding: 4px 20px 20px; }
+  .chip.active { background: var(--ink); color: #fff; }
+  .list { display: flex; flex-direction: column; gap: 8px; }
   .row {
-    background: var(--card);
-    border: 1px solid var(--line);
-    border-radius: 16px;
-    padding: 14px;
-    margin-bottom: 10px;
     display: flex; align-items: center; gap: 12px;
+    padding: 11px 12px; border-radius: 10px; border: 1px solid var(--line);
   }
-  .row .thumb {
-    width: 44px; height: 44px; border-radius: 12px;
-    background: #eef0e6;
-    display: flex; align-items: center; justify-content: center;
+  .thumb {
+    width: 38px; height: 38px; flex: 0 0 auto; border-radius: 9px;
+    background: var(--fill); display: grid; place-items: center;
   }
-  .row .meta { flex: 1; }
-  .row .title { font-size: 15px; font-weight: 600; }
-  .row .sub { font-size: 13px; color: var(--muted); }
-  .row .more { color: var(--muted); }
-  nav.tabbar {
-    height: 70px;
-    background: var(--card);
-    border-top: 1px solid var(--line);
-    display: grid; grid-template-columns: repeat(5, 1fr);
-    align-items: center;
+  .meta { flex: 1; min-width: 0; }
+  .meta .title { font-size: 13.5px; }
+  .meta .sub { font-size: 11.5px; color: var(--ink-soft); margin-top: 2px; }
+  .tabbar {
+    display: flex; justify-content: space-between;
+    margin-top: 16px; padding: 12px 6px 2px; border-top: 1px solid var(--line);
   }
-  nav.tabbar button {
-    background: none; border: none; cursor: pointer;
-    display: flex; flex-direction: column; align-items: center; gap: 4px;
-    color: var(--muted); font-size: 11px;
-    padding: 4px 0;
+  .tabbar button {
+    flex: 1; display: flex; flex-direction: column; align-items: center; gap: 5px;
+    border: none; background: none; cursor: pointer;
+    font-family: inherit; font-size: 10px; color: var(--ink-soft);
   }
-  nav.tabbar button.active { color: var(--accent); }
-  .fab {
-    position: absolute;
-    right: 22px; bottom: 92px;
-    width: 56px; height: 56px;
-    border-radius: 50%;
-    background: var(--accent);
-    color: white;
-    border: none; cursor: pointer;
-    box-shadow: 0 12px 24px rgba(60,64,43,.35);
-    display: flex; align-items: center; justify-content: center;
+  .tabbar button.active { color: var(--ink); }
+
+  /* Icons are masks, so colour comes from `color` like any text. */
+  .icn {
+    display: inline-block;
+    width: 20px; height: 20px;
+    flex: 0 0 auto;
+    background-color: currentColor;
+    -webkit-mask: var(--src) center / contain no-repeat;
+    mask: var(--src) center / contain no-repeat;
   }
-  .icn { display: inline-block; width: 22px; height: 22px; }
-  .icn svg { width: 100%; height: 100%; display: block; }
+  .icn:not([data-ready]) { background-color: transparent; }
+  .icn[data-failed="true"] {
+    background: repeating-linear-gradient(45deg, #b3261e, #b3261e 2px, transparent 2px, transparent 4px);
+  }
+  .statusbar .icn { width: 15px; height: 15px; }
+  .thumb .icn, .avatar .icn { width: 19px; height: 19px; }
+  .tabbar .icn { width: 21px; height: 21px; }
+
+  @media (max-width: 860px) {
+    .wrap { grid-template-columns: minmax(0, 1fr); gap: 28px; }
+    .panel { order: 2; }
+    .stage { order: 1; }
+  }
 </style>
 </head>
 <body>
-  <div class="device">
-    <div class="statusbar">
-      <span>9:41</span>
-      <div class="statusbar-icons">
-        <span class="icn" data-icon="cell-signal-high"></span>
-        <span class="icn" data-icon="wifi-high"></span>
-        <span class="icn" data-icon="battery-high"></span>
-      </div>
+<div class="wrap">
+
+  <section class="panel">
+    <h1>Autonaut Icons — live</h1>
+    <p class="lede">
+      Every glyph below is fetched at runtime from the published library. Change
+      the brand or the weight and the whole screen re-skins — no rebuild, no
+      redeploy, nothing bundled into this page.
+    </p>
+
+    <div class="field">
+      <span>Brand</span>
+      <div class="segments" id="brands"></div>
     </div>
 
-    <header>
-      <h1>Today</h1>
-      <div class="avatar"><span class="icn" data-icon="user" data-color="white"></span></div>
-    </header>
-
-    <div class="search">
-      <span class="icn" data-icon="magnifying-glass"></span>
-      <input placeholder="Search anything" />
-      <span class="icn" data-icon="microphone"></span>
+    <div class="field">
+      <span>Weight</span>
+      <div class="segments" id="weights"></div>
     </div>
 
-    <div class="chips">
-      <span class="chip active"><span class="icn" data-icon="sparkle" data-color="white"></span> Featured</span>
-      <span class="chip"><span class="icn" data-icon="music-notes"></span> Music</span>
-      <span class="chip"><span class="icn" data-icon="film-strip"></span> Movies</span>
-      <span class="chip"><span class="icn" data-icon="book-open"></span> Books</span>
-      <span class="chip"><span class="icn" data-icon="camera"></span> Photos</span>
+    <div class="source">
+      <b>Fetching from</b>
+      <code id="pattern"></code>
+      <p class="status" id="status">Loading…</p>
+      <button type="button" class="seg" id="reload" style="margin-top:10px">
+        Reload from live
+      </button>
     </div>
+  </section>
 
-    <div class="list">
-      <div class="row">
-        <div class="thumb"><span class="icn" data-icon="cloud-sun"></span></div>
-        <div class="meta">
-          <div class="title">Weather</div>
-          <div class="sub">28°C · Partly cloudy</div>
+  <section class="stage">
+    <div class="device">
+      <div class="statusbar">
+        <span>9:41</span>
+        <div class="statusbar-icons">
+          <span class="icn" data-icon="signal-tower"></span>
+          <span class="icn" data-icon="wifi-full"></span>
+          <span class="icn" data-icon="battery-full"></span>
         </div>
-        <span class="more icn" data-icon="caret-right"></span>
       </div>
-      <div class="row">
-        <div class="thumb"><span class="icn" data-icon="calendar-blank"></span></div>
-        <div class="meta">
-          <div class="title">Calendar</div>
-          <div class="sub">3 events today</div>
+
+      <header class="app">
+        <h2>Today</h2>
+        <div class="avatar"><span class="icn" data-icon="circle-person"></span></div>
+      </header>
+
+      <div class="search">
+        <span class="icn" data-icon="magnifying-glass"></span>
+        <input placeholder="Search anything" aria-label="Search anything" />
+        <span class="icn" data-icon="microphone"></span>
+      </div>
+
+      <div class="chips">
+        <span class="chip active"><span class="icn" data-icon="sparkle"></span>Featured</span>
+        <span class="chip"><span class="icn" data-icon="audio"></span>Music</span>
+        <span class="chip"><span class="icn" data-icon="clapperboard"></span>Movies</span>
+        <span class="chip"><span class="icn" data-icon="book"></span>Books</span>
+        <span class="chip"><span class="icn" data-icon="camera-1"></span>Photos</span>
+      </div>
+
+      <div class="list">
+        <div class="row">
+          <div class="thumb"><span class="icn" data-icon="cloudy"></span></div>
+          <div class="meta"><div class="title">Weather</div><div class="sub">28°C · Partly cloudy</div></div>
+          <span class="icn" data-icon="chevron-right"></span>
         </div>
-        <span class="more icn" data-icon="caret-right"></span>
-      </div>
-      <div class="row">
-        <div class="thumb"><span class="icn" data-icon="chat-circle-dots"></span></div>
-        <div class="meta">
-          <div class="title">Messages</div>
-          <div class="sub">2 new from Alex</div>
+        <div class="row">
+          <div class="thumb"><span class="icn" data-icon="calendar-1"></span></div>
+          <div class="meta"><div class="title">Calendar</div><div class="sub">3 events today</div></div>
+          <span class="icn" data-icon="chevron-right"></span>
         </div>
-        <span class="more icn" data-icon="caret-right"></span>
-      </div>
-      <div class="row">
-        <div class="thumb"><span class="icn" data-icon="map-pin"></span></div>
-        <div class="meta">
-          <div class="title">Places near you</div>
-          <div class="sub">12 picks within 1km</div>
+        <div class="row">
+          <div class="thumb"><span class="icn" data-icon="bubble-dots"></span></div>
+          <div class="meta"><div class="title">Messages</div><div class="sub">2 new from Alex</div></div>
+          <span class="icn" data-icon="chevron-right"></span>
         </div>
-        <span class="more icn" data-icon="caret-right"></span>
-      </div>
-      <div class="row">
-        <div class="thumb"><span class="icn" data-icon="shopping-bag-open"></span></div>
-        <div class="meta">
-          <div class="title">Orders</div>
-          <div class="sub">1 arriving tomorrow</div>
+        <div class="row">
+          <div class="thumb"><span class="icn" data-icon="map-pin"></span></div>
+          <div class="meta"><div class="title">Places near you</div><div class="sub">12 picks within 1km</div></div>
+          <span class="icn" data-icon="chevron-right"></span>
         </div>
-        <span class="more icn" data-icon="caret-right"></span>
+        <div class="row">
+          <div class="thumb"><span class="icn" data-icon="shopping-bag-1"></span></div>
+          <div class="meta"><div class="title">Orders</div><div class="sub">1 arriving tomorrow</div></div>
+          <span class="icn" data-icon="chevron-right"></span>
+        </div>
       </div>
+
+      <nav class="tabbar">
+        <button class="active"><span class="icn" data-icon="home"></span>Home</button>
+        <button><span class="icn" data-icon="compass-round"></span>Explore</button>
+        <button><span class="icn" data-icon="heart"></span>Saved</button>
+        <button><span class="icn" data-icon="bell"></span>Alerts</button>
+        <button><span class="icn" data-icon="circle-person"></span>Profile</button>
+      </nav>
     </div>
+  </section>
 
-    <button class="fab" aria-label="New"><span class="icn" data-icon="plus" data-color="white" style="width:24px;height:24px"></span></button>
-
-    <nav class="tabbar">
-      <button class="active"><span class="icn" data-icon="house-simple"></span>Home</button>
-      <button><span class="icn" data-icon="compass"></span>Explore</button>
-      <button><span class="icn" data-icon="heart"></span>Saved</button>
-      <button><span class="icn" data-icon="bell"></span>Alerts</button>
-      <button><span class="icn" data-icon="user-circle"></span>Profile</button>
-    </nav>
-  </div>
+</div>
 
 <script>
-  // Elsway icon CDN: self-hosted raw SVGs
-  const CDN = "https://elsway.github.io/elsway-icons/raw/regular/";
+  // The published library, not a copy of it. Served with
+  // `access-control-allow-origin: *`, so this page works from any origin.
+  const BASE = "https://autonaut-icons.vercel.app/raw/elsway";
 
-  async function loadIcon(el) {
-    const name = el.dataset.icon;
-    const color = el.dataset.color || "currentColor";
-    try {
-      const res = await fetch(CDN + name + ".svg");
-      if (!res.ok) throw new Error(res.status);
-      let svg = await res.text();
-      // recolor strokes
-      svg = svg.replace(/stroke="currentColor"/g, 'stroke="' + color + '"');
-      svg = svg.replace(/fill="currentColor"/g, 'fill="' + color + '"');
-      el.innerHTML = svg;
-    } catch (e) {
-      el.textContent = "·";
+  const BRANDS = [
+    ["default", "Default"], ["cars24", "Cars24"], ["teambhp", "TeamBHP"],
+    ["carinfo", "CarInfo"], ["vehicleinfo", "VehicleInfo"],
+  ];
+  const WEIGHTS = [["regular", "Regular"], ["fill", "Fill"]];
+
+  let brand = "cars24";
+  let weight = "regular";
+
+  const els = [...document.querySelectorAll(".icn[data-icon]")];
+  const statusEl = document.getElementById("status");
+  const patternEl = document.getElementById("pattern");
+
+  function buildSegments(id, items, current, onPick) {
+    const host = document.getElementById(id);
+    host.replaceChildren(...items.map(([value, label]) => {
+      const b = document.createElement("button");
+      b.type = "button";
+      b.className = "seg";
+      b.textContent = label;
+      b.setAttribute("aria-pressed", String(value === current()));
+      b.onclick = () => onPick(value);
+      return b;
+    }));
+  }
+
+  function renderSegments() {
+    buildSegments("brands", BRANDS, () => brand, (v) => { brand = v; apply(); });
+    buildSegments("weights", WEIGHTS, () => weight, (v) => { weight = v; apply(); });
+  }
+
+  async function apply(bypass = false) {
+    renderSegments();
+    patternEl.innerHTML =
+      `${BASE}/<em>${brand}</em>/<em>${weight}</em>/{name}.svg`;
+
+    const started = performance.now();
+    statusEl.dataset.state = "";
+    statusEl.textContent = "Loading…";
+
+    // A HEAD-less check: fetch each icon once and mask with a blob URL, so a
+    // 404 surfaces as a visible hatched box instead of an empty gap. The old
+    // demo swallowed failures and showed a dot, which is why it went a week
+    // pointing at a stale host without anyone noticing.
+    const unique = [...new Set(els.map((e) => e.dataset.icon))];
+    const results = await Promise.all(unique.map(async (name) => {
+      const url = `${BASE}/${brand}/${weight}/${name}.svg`;
+      try {
+        // No caching. The library files are served `must-revalidate`,
+        // and `reload` additionally bypasses any intermediate copy -- edit an
+        // icon on the live site, hit Reload here, and it changes.
+        const res = await fetch(url, { cache: bypass ? "reload" : "no-cache" });
+        if (!res.ok) throw new Error(res.status);
+        return [name, url, true];
+      } catch {
+        return [name, url, false];
+      }
+    }));
+
+    const map = new Map(results.map(([n, u, ok]) => [n, { u, ok }]));
+    for (const el of els) {
+      const hit = map.get(el.dataset.icon);
+      el.style.setProperty("--src", `url("${hit.u}")`);
+      el.dataset.failed = String(!hit.ok);
+      el.dataset.ready = "1";
+      el.title = `${el.dataset.icon} · ${brand}/${weight}`;
+    }
+
+    const failed = results.filter((r) => !r[2]);
+    const ms = Math.round(performance.now() - started);
+    if (failed.length) {
+      statusEl.dataset.state = "error";
+      statusEl.textContent =
+        `${failed.length} of ${unique.length} failed: ${failed.map((f) => f[0]).join(", ")}`;
+    } else {
+      statusEl.textContent = `${unique.length} icons · ${ms}ms`;
     }
   }
-  document.querySelectorAll(".icn[data-icon]").forEach(loadIcon);
+
+  document.getElementById("reload").onclick = () => apply(true);
+
+  apply();
 </script>
 </body>
 </html>
